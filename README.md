@@ -1,4 +1,4 @@
-pg_snakeoil - The PostgreSQL Antivirus
+# pg_snakeoil - The PostgreSQL Antivirus
 
 Running typical antivirus software on a PostgreSQL Server has severe
 drawbacks such as severely affecting performance or making the system
@@ -19,6 +19,29 @@ pg_snakeoil is to provide ClamAV scanning of all data entereing a
 PostgreSQL in a way that does not interfere with the proper function
 of PostgreSQL and does not cause collateral damage or unneccesary
 downtimes.
+
+## Usage
+
+### SQL Functions
+
+pg_snakeoil provides SQL functions to scan given data for viruses, ether manually or automated by e.g. triggers.
+The following functions are implemented.
+
+#### pg_snakeoil_find_virus (text) RETURNS bool
+
+Returns true if the given data matches a signature in the virus database.
+Will only show the virus name as a notice.
+
+#### pg_snakeoil_virus_name (text) RETURNS text
+
+Returns virus name if the given data matches a signature in the virus database, empty string otherwise.
+
+### On Access (INSERT/UPDATE) scanning
+
+Check data before it is accepted and stored into the Database.
+Action on positive finding is customizable
+
+### Scan via pg_logical
 
 This is facilitated by using pg_receivelogical to acquire the data
 entering the server instead of file system access, allowing offloading

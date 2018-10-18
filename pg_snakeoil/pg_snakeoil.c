@@ -29,30 +29,29 @@ void _PG_init(void)
 {
 	if (CL_SUCCESS != cl_init(CL_INIT_DEFAULT))
 	{
-		elog(NOTICE, "cl_init failed");
+		elog(DEBUG1, "cl_init failed");
 		//return 1;
 	}
 
 	engine = cl_engine_new();
 	const char *dbDir = cl_retdbdir();
 	int signatureNum = 0;
-	elog(NOTICE, "Use default db dir '%s'", dbDir);
+	elog(DEBUG1, "Use default db dir '%s'", dbDir);
 
-	elog(NOTICE, "(cl_load)");
+	elog(DEBUG1, "(cl_load)");
 	if (CL_SUCCESS != cl_load(dbDir, engine, &signatureNum, CL_DB_STDOPT))
 	{
-		elog(NOTICE, "cl_load failed");
+		elog(DEBUG1, "cl_load failed");
 		//return 1;
 	}
 
-	elog(NOTICE, "(cl_engine_compile)");
+	elog(DEBUG1, "(cl_engine_compile)");
 	if (CL_SUCCESS != cl_engine_compile(engine))
 	{
-		elog(NOTICE, "cl_engine_compile failed");
+		elog(DEBUG1, "cl_engine_compile failed");
 		//return 1;
 	}
-	elog(NOTICE, "_PG_init() done");
-	printf("_PG_init() done");
+	elog(DEBUG1, "_PG_init() done");
 }
 
 void _PG_fini(void)
@@ -88,32 +87,28 @@ pg_snakeoil_scan(PG_FUNCTION_ARGS)
 	* you can't give it parts of a file and expect detection to work.
 	*/
 	map = cl_fmap_open_memory(data, data_size);
-	elog(NOTICE, "sizeof: %d", data_size);
+	elog(DEBUG1, "sizeof: %d", data_size);
 
-	{
-		char *output_data = palloc(data_size+1);
-		strncpy(output_data, data, data_size);
-		elog(NOTICE, "data: %s", output_data); // TODO: FIX OUTPUT
-	}
+	elog(DEBUG1, "data: %s", pnstrdup(data, data_size)); // TODO: FIX OUTPUT
 
 	// Scan custom data
-	elog(NOTICE, "cl_scanmap_callback");
+	elog(DEBUG1, "cl_scanmap_callback");
 	ret = cl_scanmap_callback(map, &virusName, &scanned, engine, CL_SCAN_STDOPT, NULL);
 
 	/*
 	* Releases resources associated with the map, you should release any resources
 	* you hold only after (handles, maps) calling this function
 	*/
-	elog(NOTICE, "datcl_fmap_close");
+	elog(DEBUG1, "datcl_fmap_close");
 	cl_fmap_close(map);
 
-
-	elog(NOTICE, "cl_scanmap_callback returned: %d virusname: %s", ret, virusName);
+	elog(DEBUG1, "cl_scanmap_callback returned: %d virusname: %s", ret, virusName);
 	if (ret == 0)
 	{
 		PG_RETURN_BOOL(true);
 	} else
 	{
+		elog(NOTICE, "Virus found: %s", virusName);
 		PG_RETURN_BOOL(false);
 	}
 }

@@ -19,14 +19,29 @@
 
 PG_MODULE_MAGIC;
 
+void _PG_init(void);
+void _PG_fini(void);
+struct scan_result scan_data(const char *data, size_t data_size);
+Datum pg_snakeoil_find_virus(PG_FUNCTION_ARGS);
+Datum pg_snakeoil_virus_name(PG_FUNCTION_ARGS);
+
+
+// Holds the data of a virus scan
+struct scan_result
+{
+	int return_code;
+	const char *virus_name;
+	long unsigned int scanned;
+};
+
 // Global variable to access the clamav engine
 struct cl_engine *engine;
 
-//extern void _PG_init(void);
-//extern void _PG_fini(void);
-
-void _PG_init(void)
+void _PG_init()
 {
+	const char *dbDir;
+	unsigned int signatureNum;
+
 	if (CL_SUCCESS != cl_init(CL_INIT_DEFAULT))
 	{
 		elog(DEBUG1, "cl_init failed");
@@ -34,8 +49,8 @@ void _PG_init(void)
 	}
 
 	engine = cl_engine_new();
-	const char *dbDir = cl_retdbdir();
-	int signatureNum = 0;
+	dbDir = cl_retdbdir();
+	signatureNum = 0;
 	elog(DEBUG1, "Use default db dir '%s'", dbDir);
 
 	elog(DEBUG1, "(cl_load)");
@@ -54,30 +69,14 @@ void _PG_init(void)
 	elog(DEBUG1, "_PG_init() done");
 }
 
-void _PG_fini(void)
+void _PG_fini()
 {
 	cl_engine_free(engine);
 }
 
-
-PG_FUNCTION_INFO_V1(pg_snakeoil_scan);
-Datum
-pg_snakeoil_scan(PG_FUNCTION_ARGS)
+struct scan_result scan_data(const char *data, size_t data_size)
 {
-	text	   *input = PG_GETARG_BYTEA_P(0);
-
-	const char *data;
-	size_t data_size;
-
-	/* Extract a pointer to the actual character data */
-	data = VARDATA_ANY(input);
-	data_size = VARSIZE_ANY_EXHDR(input);
-
-	int ret = 0;
-	int idx = 0;
-	int scanRet = 0;
-	const char *virusName = NULL;
-	long unsigned int scanned = 0;
+	struct scan_result result;
 	cl_fmap_t *map;
 
 	/*
@@ -86,29 +85,77 @@ pg_snakeoil_scan(PG_FUNCTION_ARGS)
 	* Note that the memory [start, start+len) must be the _entire_ file,
 	* you can't give it parts of a file and expect detection to work.
 	*/
+	elog(DEBUG2, "cl_fmap_open_memory");
 	map = cl_fmap_open_memory(data, data_size);
-	elog(DEBUG1, "sizeof: %d", data_size);
 
-	elog(DEBUG1, "data: %s", pnstrdup(data, data_size)); // TODO: FIX OUTPUT
+	elog(DEBUG2, "data_size: %lu", data_size);
+	elog(DEBUG2, "data: %s", pnstrdup(data, data_size)); // TODO: FIX OUTPUT
 
-	// Scan custom data
-	elog(DEBUG1, "cl_scanmap_callback");
-	ret = cl_scanmap_callback(map, &virusName, &scanned, engine, CL_SCAN_STDOPT, NULL);
+	// Scan data
+	elog(DEBUG2, "cl_scanmap_callback");
+	result.return_code = cl_scanmap_callback(map, &result.virus_name, &result.scanned, engine, CL_SCAN_STDOPT, NULL);
+
+	elog(DEBUG2, "cl_scanmap_callback returned: %d virusname: %s", result.return_code, result.virus_name);
 
 	/*
 	* Releases resources associated with the map, you should release any resources
 	* you hold only after (handles, maps) calling this function
 	*/
-	elog(DEBUG1, "datcl_fmap_close");
+	elog(DEBUG2, "cl_fmap_close");
 	cl_fmap_close(map);
 
-	elog(DEBUG1, "cl_scanmap_callback returned: %d virusname: %s", ret, virusName);
-	if (ret == 0)
+	return result;
+}
+
+PG_FUNCTION_INFO_V1(pg_snakeoil_find_virus);
+Datum
+pg_snakeoil_find_virus(PG_FUNCTION_ARGS)
+{
+	text	   *input = PG_GETARG_BYTEA_P(0);
+
+	const char *data;
+	size_t data_size;
+	struct scan_result result;
+
+	/* Extract a pointer to the actual character data */
+	data = VARDATA_ANY(input);
+	data_size = VARSIZE_ANY_EXHDR(input);
+
+	result = scan_data(data, data_size);
+
+	elog(DEBUG1, "cl_scanmap_callback returned: %d virusname: %s", result.return_code, result.virus_name);
+	if (result.return_code == 0)
 	{
-		PG_RETURN_BOOL(true);
+		PG_RETURN_BOOL(false);
 	} else
 	{
-		elog(NOTICE, "Virus found: %s", virusName);
-		PG_RETURN_BOOL(false);
+		elog(NOTICE, "Virus found: %s", result.virus_name);
+		PG_RETURN_BOOL(true);
+	}
+}
+
+PG_FUNCTION_INFO_V1(pg_snakeoil_virus_name);
+Datum
+pg_snakeoil_virus_name(PG_FUNCTION_ARGS)
+{
+	text	   *input = PG_GETARG_BYTEA_P(0);
+
+	const char *data;
+	size_t data_size;
+	struct scan_result result;
+
+	/* Extract a pointer to the actual character data */
+	data = VARDATA_ANY(input);
+	data_size = VARSIZE_ANY_EXHDR(input);
+
+	result = scan_data(data, data_size);
+
+	elog(DEBUG1, "cl_scanmap_callback returned: %d virusname: %s", result.return_code, result.virus_name);
+	if (result.return_code == 0)
+	{
+		PG_RETURN_TEXT_P(NULL);
+	} else
+	{
+		PG_RETURN_TEXT_P(result.virus_name);
 	}
 }

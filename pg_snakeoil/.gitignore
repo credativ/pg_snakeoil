@@ -1,0 +1,8 @@
+# Generated subdirectories
+/log/
+/results/
+/tmp_check/
+pg_snakeoil.so
+*.o
+*.bc
+*.so

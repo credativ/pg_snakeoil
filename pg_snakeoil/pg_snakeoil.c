@@ -22,18 +22,18 @@ PG_MODULE_MAGIC;
 // Global variable to access the clamav engine
 struct cl_engine *engine;
 
-extern int _PG_init(void);
-extern void _PG_fini(void);
+//extern void _PG_init(void);
+//extern void _PG_fini(void);
 
-int _PG_init()
+void _PG_init(void)
 {
 	if (CL_SUCCESS != cl_init(CL_INIT_DEFAULT))
 	{
 		elog(NOTICE, "cl_init failed");
-		return 1;
+		//return 1;
 	}
 
-	struct cl_engine *engine = cl_engine_new();
+	engine = cl_engine_new();
 	const char *dbDir = cl_retdbdir();
 	int signatureNum = 0;
 	elog(NOTICE, "Use default db dir '%s'", dbDir);
@@ -42,19 +42,20 @@ int _PG_init()
 	if (CL_SUCCESS != cl_load(dbDir, engine, &signatureNum, CL_DB_STDOPT))
 	{
 		elog(NOTICE, "cl_load failed");
-		return 1;
+		//return 1;
 	}
 
 	elog(NOTICE, "(cl_engine_compile)");
 	if (CL_SUCCESS != cl_engine_compile(engine))
 	{
 		elog(NOTICE, "cl_engine_compile failed");
-		return 1;
+		//return 1;
 	}
 	elog(NOTICE, "_PG_init() done");
+	printf("_PG_init() done");
 }
 
-void _PG_fini()
+void _PG_fini(void)
 {
 	cl_engine_free(engine);
 }
@@ -99,11 +100,14 @@ pg_snakeoil_scan(PG_FUNCTION_ARGS)
 	* Releases resources associated with the map, you should release any resources
 	* you hold only after (handles, maps) calling this function
 	*/
+	elog(NOTICE, "datcl_fmap_close");
 	cl_fmap_close(map);
 
 	// Scan custom data
+	elog(NOTICE, "cl_scanmap_callback");
 	ret = cl_scanmap_callback(map, &virusName, &scanned, engine, CL_SCAN_STDOPT, NULL);
 
+	elog(NOTICE, "cl_scanmap_callback returned: %d virusname: %s", ret, virusName);
 	if (ret == 0)
 	{
 		PG_RETURN_BOOL(true);

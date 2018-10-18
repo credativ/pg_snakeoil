@@ -96,6 +96,10 @@ pg_snakeoil_scan(PG_FUNCTION_ARGS)
 		elog(NOTICE, "data: %s", output_data); // TODO: FIX OUTPUT
 	}
 
+	// Scan custom data
+	elog(NOTICE, "cl_scanmap_callback");
+	ret = cl_scanmap_callback(map, &virusName, &scanned, engine, CL_SCAN_STDOPT, NULL);
+
 	/*
 	* Releases resources associated with the map, you should release any resources
 	* you hold only after (handles, maps) calling this function
@@ -103,9 +107,6 @@ pg_snakeoil_scan(PG_FUNCTION_ARGS)
 	elog(NOTICE, "datcl_fmap_close");
 	cl_fmap_close(map);
 
-	// Scan custom data
-	elog(NOTICE, "cl_scanmap_callback");
-	ret = cl_scanmap_callback(map, &virusName, &scanned, engine, CL_SCAN_STDOPT, NULL);
 
 	elog(NOTICE, "cl_scanmap_callback returned: %d virusname: %s", ret, virusName);
 	if (ret == 0)

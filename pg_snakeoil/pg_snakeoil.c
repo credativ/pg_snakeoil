@@ -42,6 +42,8 @@ void _PG_init()
 	const char *dbDir;
 	unsigned int signatureNum;
 
+	elog(NOTICE, "pg_snakeoil starts the clamav engine, this can take a while");
+
 	if (CL_SUCCESS != cl_init(CL_INIT_DEFAULT))
 	{
 		elog(DEBUG1, "cl_init failed");
@@ -111,7 +113,7 @@ PG_FUNCTION_INFO_V1(pg_snakeoil_find_virus);
 Datum
 pg_snakeoil_find_virus(PG_FUNCTION_ARGS)
 {
-	text	   *input = PG_GETARG_BYTEA_P(0);
+	bytea	   *input = PG_GETARG_BYTEA_P(0);
 
 	const char *data;
 	size_t data_size;
@@ -123,7 +125,6 @@ pg_snakeoil_find_virus(PG_FUNCTION_ARGS)
 
 	result = scan_data(data, data_size);
 
-	elog(DEBUG1, "cl_scanmap_callback returned: %d virusname: %s", result.return_code, result.virus_name);
 	if (result.return_code == 0)
 	{
 		PG_RETURN_BOOL(false);
@@ -138,7 +139,7 @@ PG_FUNCTION_INFO_V1(pg_snakeoil_virus_name);
 Datum
 pg_snakeoil_virus_name(PG_FUNCTION_ARGS)
 {
-	text	   *input = PG_GETARG_BYTEA_P(0);
+	bytea 	   *input = PG_GETARG_BYTEA_P(0);
 
 	const char *data;
 	size_t data_size;
@@ -150,12 +151,11 @@ pg_snakeoil_virus_name(PG_FUNCTION_ARGS)
 
 	result = scan_data(data, data_size);
 
-	elog(DEBUG1, "cl_scanmap_callback returned: %d virusname: %s", result.return_code, result.virus_name);
 	if (result.return_code == 0)
 	{
-		PG_RETURN_TEXT_P(NULL);
+		PG_RETURN_NULL();
 	} else
 	{
-		PG_RETURN_TEXT_P(result.virus_name);
+		PG_RETURN_TEXT_P(cstring_to_text(result.virus_name));
 	}
 }

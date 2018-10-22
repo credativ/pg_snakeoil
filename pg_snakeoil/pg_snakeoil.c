@@ -78,7 +78,7 @@ void _PG_fini()
 
 struct scan_result scan_data(const char *data, size_t data_size)
 {
-	struct scan_result result;
+	struct scan_result result = {0, "", 0};
 	cl_fmap_t *map;
 
 	/*
@@ -96,7 +96,6 @@ struct scan_result scan_data(const char *data, size_t data_size)
 	// Scan data
 	elog(DEBUG2, "cl_scanmap_callback");
 	result.return_code = cl_scanmap_callback(map, &result.virus_name, &result.scanned, engine, CL_SCAN_STDOPT, NULL);
-
 	elog(DEBUG2, "cl_scanmap_callback returned: %d virusname: %s", result.return_code, result.virus_name);
 
 	/*

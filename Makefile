@@ -5,7 +5,7 @@ OBJS = pg_snakeoil.o
 
 EXTENSION = pg_snakeoil
 DATA = "pg_snakeoil--0.1.sql"
-PGFILEDESC = "pg_snakeoil - the real anti virus"
+PGFILEDESC = "pg_snakeoil - clamav antivirus integration"
 
 # Only works when using pgxs
 PG_CONFIG = pg_config

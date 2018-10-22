@@ -1,7 +1,11 @@
-/*
- * pg_snakeoil.c
- * Alexander Sosna <alexander.sosna@credativ.de>
+/*-------------------------------------------------------------------------
  *
+ * pg_snakeoil.c
+ * 		ClamAV antivirus integration, can check given data with ClamAV
+ *
+ * Copyright (c) 2018, Alexander Sosna <alexander.sosna@credativ.de>
+ *
+ *-------------------------------------------------------------------------
  */
 
 #include "postgres.h"
@@ -26,7 +30,9 @@ Datum pg_snakeoil_find_virus(PG_FUNCTION_ARGS);
 Datum pg_snakeoil_virus_name(PG_FUNCTION_ARGS);
 
 
-// Holds the data of a virus scan
+/*
+ * Holds the data of a virus scan
+ */
 struct scan_result
 {
 	int return_code;
@@ -34,9 +40,12 @@ struct scan_result
 	long unsigned int scanned;
 };
 
-// Global variable to access the clamav engine
+/*
+ * Global variable to access the clamav engine
+ */
 struct cl_engine *engine;
 
+/* Initialize the engine for further use, this takes some time! */
 void _PG_init()
 {
 	const char *dbDir;
@@ -46,8 +55,7 @@ void _PG_init()
 
 	if (CL_SUCCESS != cl_init(CL_INIT_DEFAULT))
 	{
-		elog(DEBUG1, "cl_init failed");
-		//return 1;
+		elog(WARNING, "cl_init failed");
 	}
 
 	engine = cl_engine_new();
@@ -93,15 +101,17 @@ struct scan_result scan_data(const char *data, size_t data_size)
 	elog(DEBUG2, "data_size: %lu", data_size);
 	elog(DEBUG2, "data: %s", pnstrdup(data, data_size)); // TODO: FIX OUTPUT
 
-	// Scan data
+	/*
+	 * Scan data
+	 */
 	elog(DEBUG2, "cl_scanmap_callback");
 	result.return_code = cl_scanmap_callback(map, &result.virus_name, &result.scanned, engine, CL_SCAN_STDOPT, NULL);
 	elog(DEBUG2, "cl_scanmap_callback returned: %d virusname: %s", result.return_code, result.virus_name);
 
 	/*
-	* Releases resources associated with the map, you should release any resources
-	* you hold only after (handles, maps) calling this function
-	*/
+	 * Releases resources associated with the map, you should release any resources
+	 * you hold only after (handles, maps) calling this function
+	 */
 	elog(DEBUG2, "cl_fmap_close");
 	cl_fmap_close(map);
 

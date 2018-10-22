@@ -36,7 +36,7 @@ Will only show the virus name as a notice.
 
 Returns virus name if the given data matches a signature in the virus database, empty string otherwise.
 
-## On Access (INSERT/UPDATE) scanning
+### On Access (INSERT/UPDATE) scanning
 
 Check data before it is accepted and stored into the Database.
 Action on positive finding is customizable

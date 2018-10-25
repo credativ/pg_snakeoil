@@ -45,7 +45,9 @@ struct scan_result
  */
 struct cl_engine *engine;
 
-/* Initialize the engine for further use, this takes some time! */
+/*
+ * Initialize the engine for further use, this takes some time!
+ */
 void _PG_init()
 {
 	const char *dbDir;
@@ -55,7 +57,7 @@ void _PG_init()
 
 	if (CL_SUCCESS != cl_init(CL_INIT_DEFAULT))
 	{
-		elog(WARNING, "cl_init failed");
+		elog(ERROR, "cl_init failed");
 	}
 
 	engine = cl_engine_new();
@@ -63,20 +65,16 @@ void _PG_init()
 	signatureNum = 0;
 	elog(DEBUG1, "Use default db dir '%s'", dbDir);
 
-	elog(DEBUG1, "(cl_load)");
 	if (CL_SUCCESS != cl_load(dbDir, engine, &signatureNum, CL_DB_STDOPT))
 	{
-		elog(DEBUG1, "cl_load failed");
-		//return 1;
+		elog(ERROR, "cl_load failed");
 	}
 
 	elog(DEBUG1, "(cl_engine_compile)");
 	if (CL_SUCCESS != cl_engine_compile(engine))
 	{
-		elog(DEBUG1, "cl_engine_compile failed");
-		//return 1;
+		elog(ERROR, "cl_engine_compile failed");
 	}
-	elog(DEBUG1, "_PG_init() done");
 }
 
 void _PG_fini()
@@ -128,7 +126,9 @@ pg_snakeoil_find_virus(PG_FUNCTION_ARGS)
 	size_t data_size;
 	struct scan_result result;
 
-	/* Extract a pointer to the actual character data */
+	/*
+	 * Extract a pointer to the actual character data
+	 */
 	data = VARDATA_ANY(input);
 	data_size = VARSIZE_ANY_EXHDR(input);
 
@@ -154,7 +154,9 @@ pg_snakeoil_virus_name(PG_FUNCTION_ARGS)
 	size_t data_size;
 	struct scan_result result;
 
-	/* Extract a pointer to the actual character data */
+	/*
+	 * Extract a pointer to the actual character data
+	 */
 	data = VARDATA_ANY(input);
 	data_size = VARSIZE_ANY_EXHDR(input);
 

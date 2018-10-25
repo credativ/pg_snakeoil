@@ -49,3 +49,31 @@ of the CPU-time required for scanning to another server. The reaction
 to a positive ClamAV result is fully customizable from asynchronous
 notification of the admins or synchronous denial of a commit to the
 application.
+
+
+## Installation
+
+### Compile
+
+```bash
+make
+sudo make install
+```
+
+### Preload
+
+pg_snakeoil can be loaded by each backend when needed.
+But then an instance of the engine is started for every new backend.
+This takes some time for the first function call after connecting!
+
+To avoid this pg_snakeoil can be added to the  *shared_preload_libraries*.
+
+```
+shared_preload_libraries = 'pg_snakeoil' # (change requires restart)
+```
+
+### Create Extension
+
+```SQL
+CREATE EXTENSION pg_snakeoil;
+```

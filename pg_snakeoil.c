@@ -52,12 +52,14 @@ void _PG_init()
 {
 	const char *dbDir;
 	unsigned int signatureNum;
+	int rv;
 
 	elog(NOTICE, "pg_snakeoil starts the clamav engine, this can take a while");
 
-	if (CL_SUCCESS != cl_init(CL_INIT_DEFAULT))
+	rv = cl_init(CL_INIT_DEFAULT);
+	if (CL_SUCCESS != rv)
 	{
-		elog(ERROR, "cl_init failed");
+		elog(ERROR, "can't initialize libclamav: %s", cl_strerror(rv));
 	}
 
 	engine = cl_engine_new();
@@ -65,15 +67,17 @@ void _PG_init()
 	signatureNum = 0;
 	elog(DEBUG1, "Use default db dir '%s'", dbDir);
 
-	if (CL_SUCCESS != cl_load(dbDir, engine, &signatureNum, CL_DB_STDOPT))
+	rv = cl_load(dbDir, engine, &signatureNum, CL_DB_STDOPT);
+	if (CL_SUCCESS != rv)
 	{
-		elog(ERROR, "cl_load failed");
+		elog(ERROR, "failure loading ClamAV databases: %s", cl_strerror(rv));
 	}
 
 	elog(DEBUG1, "(cl_engine_compile)");
-	if (CL_SUCCESS != cl_engine_compile(engine))
+	rv = cl_engine_compile(engine);
+	if (CL_SUCCESS != rv)
 	{
-		elog(ERROR, "cl_engine_compile failed");
+		elog(ERROR, "cannot create ClamAV engine: %s", cl_strerror(rv));
 	}
 }
 

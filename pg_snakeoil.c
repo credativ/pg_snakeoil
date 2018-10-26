@@ -21,6 +21,12 @@
 #include <string.h>
 #include <clamav.h>
 
+/*
+ * Set SNAKEOIL_DEBUG to 1 to enable additional debug output
+ * This can produce overhead, only enable when needed
+ */
+#define SNAKEOIL_DEBUG 0
+
 PG_MODULE_MAGIC;
 
 void _PG_init(void);
@@ -97,16 +103,16 @@ struct scan_result scan_data(const char *data, size_t data_size)
 	* Note that the memory [start, start+len) must be the _entire_ file,
 	* you can't give it parts of a file and expect detection to work.
 	*/
-	elog(DEBUG2, "cl_fmap_open_memory");
 	map = cl_fmap_open_memory(data, data_size);
 
-	elog(DEBUG2, "data_size: %lu", data_size);
-	elog(DEBUG2, "data: %s", pnstrdup(data, data_size)); // TODO: FIX OUTPUT
+	#ifdef SNAKEOIL_DEBUG
+		elog(DEBUG4, "data_size: %lu", data_size);
+		elog(DEBUG4, "data: %s", pnstrdup(data, data_size));
+	#endif
 
 	/*
 	 * Scan data
 	 */
-	elog(DEBUG2, "cl_scanmap_callback");
 	result.return_code = cl_scanmap_callback(map, &result.virus_name, &result.scanned, engine, CL_SCAN_STDOPT, NULL);
 	elog(DEBUG2, "cl_scanmap_callback returned: %d virusname: %s", result.return_code, result.virus_name);
 
@@ -114,7 +120,6 @@ struct scan_result scan_data(const char *data, size_t data_size)
 	 * Releases resources associated with the map, you should release any resources
 	 * you hold only after (handles, maps) calling this function
 	 */
-	elog(DEBUG2, "cl_fmap_close");
 	cl_fmap_close(map);
 
 	return result;

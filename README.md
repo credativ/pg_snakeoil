@@ -63,7 +63,7 @@ sudo make install
 ### Preload
 
 pg_snakeoil can be loaded by each backend when needed.
-But then an instance of the engine is started for every new backend.
+Then an instance of the engine is started for every new backend.
 This takes some time for the first function call after connecting!
 
 To avoid this pg_snakeoil can be added to the  *shared_preload_libraries*.
@@ -76,4 +76,30 @@ shared_preload_libraries = 'pg_snakeoil' # (change requires restart)
 
 ```SQL
 CREATE EXTENSION pg_snakeoil;
+```
+
+## Examples
+
+### Functions
+
+#### Check Before Insert
+
+```SQL
+CREATE DOMAIN safe_text AS text CHECK (not pg_snakeoil_find_virus(value));
+
+CREATE table t1(safe safe_text);
+```
+
+```SQL
+INSERT INTO t1 VALUES ('This text is safe!');
+
+INSERT INTO t1 VALUES('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'); -- test signature
+```
+
+Output
+
+```bash
+postgres=# INSERT INTO t1 VALUES('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'); -- test signature
+NOTICE:  Virus found: Eicar-Test-Signature
+ERROR:  value for domain safe_text violates check constraint "safe_text_check"
 ```

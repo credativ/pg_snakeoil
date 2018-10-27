@@ -1,5 +1,7 @@
 # pg_snakeoil - The PostgreSQL Antivirus
 
+<img src="images/pg_snakeoil_logo.png" width="128">
+
 Running typical antivirus software on a PostgreSQL Server has severe
 drawbacks such as severely affecting performance or making the system
 no longer POSIX-compliant, which in turn is unsupported by the

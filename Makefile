@@ -7,6 +7,8 @@ EXTENSION = pg_snakeoil
 DATA = "pg_snakeoil--0.1.sql"
 PGFILEDESC = "pg_snakeoil - clamav antivirus integration"
 
+REGRESS = pg_snakeoil
+
 # Only works when using pgxs
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)

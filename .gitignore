@@ -5,3 +5,5 @@
 *.o
 *.bc
 *.so
+regression.diffs
+regression.out

@@ -1,26 +1,55 @@
 CREATE EXTENSION pg_snakeoil;
-SELECT pg_snakeoil_find_virus('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
-NOTICE:  Virus found: Eicar-Test-Signature
- pg_snakeoil_find_virus 
-------------------------
+-- ------------------------------------------------------------------------
+-- Text Functions
+-- ------------------------------------------------------------------------
+SELECT so_is_infected('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
+ so_is_infected 
+----------------
  t
 (1 row)
 
-SELECT pg_snakeoil_virus_name('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
- pg_snakeoil_virus_name 
-------------------------
+SELECT so_virus_name('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
+    so_virus_name     
+----------------------
  Eicar-Test-Signature
 (1 row)
 
-SELECT pg_snakeoil_find_virus('Hello World!');
- pg_snakeoil_find_virus 
-------------------------
+SELECT so_is_infected('Hello World!');
+ so_is_infected 
+----------------
  f
 (1 row)
 
-SELECT pg_snakeoil_virus_name('Hello World!');
- pg_snakeoil_virus_name 
-------------------------
+SELECT so_virus_name('Hello World!');
+ so_virus_name 
+---------------
+ 
+(1 row)
+
+-- ------------------------------------------------------------------------
+-- bytea Functions
+-- ------------------------------------------------------------------------
+SELECT so_is_infected(E'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'::bytea);
+ so_is_infected 
+----------------
+ t
+(1 row)
+
+SELECT so_virus_name(E'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'::bytea);
+       so_virus_name       
+---------------------------
+ Txt.Malware.Agent-1787597
+(1 row)
+
+SELECT so_is_infected(E'Hello World!'::bytea);
+ so_is_infected 
+----------------
+ f
+(1 row)
+
+SELECT so_virus_name(E'Hello World!'::bytea);
+ so_virus_name 
+---------------
  
 (1 row)
 

@@ -25,12 +25,19 @@ pg_snakeoil provides SQL functions to scan given data for viruses. The
 functions can be used manually or automatically, e.g. via triggers or check
 constraints. The following functions are implemented:
 
-#### pg_snakeoil_find_virus (text) RETURNS bool
+#### so_is_infected (text) RETURNS bool
 
 Returns true if the given data matches a signature in the virus database.
-Shows the virus name as a notice.
 
-#### pg_snakeoil_virus_name (text) RETURNS text
+#### so_virus_name (text) RETURNS text
+
+Returns virus name if the given data matches a signature in the virus database, empty string otherwise.
+
+#### so_is_infected (bytea) RETURNS bool
+
+Returns true if the given data matches a signature in the virus database.
+
+#### so_virus_name (bytea) RETURNS text
 
 Returns virus name if the given data matches a signature in the virus database,
 NULL otherwise.
@@ -74,8 +81,9 @@ CREATE EXTENSION pg_snakeoil;
 
 ```SQL
 CREATE EXTENSION pg_snakeoil;
-CREATE DOMAIN safe_text AS text CHECK (NOT pg_snakeoil_find_virus(value));
+CREATE DOMAIN safe_text AS text CHECK (NOT so_is_infected(value));
 CREATE TABLE t1(safe safe_text);
+
 
 INSERT INTO t1 VALUES ('This text is safe!');
 INSERT

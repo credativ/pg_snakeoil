@@ -127,9 +127,9 @@ struct scan_result scan_data(const char *data, size_t data_size)
 	return result;
 }
 
-PG_FUNCTION_INFO_V1(pg_snakeoil_find_virus);
+PG_FUNCTION_INFO_V1(so_is_infected);
 Datum
-pg_snakeoil_find_virus(PG_FUNCTION_ARGS)
+so_is_infected(PG_FUNCTION_ARGS)
 {
 	bytea	   *input = PG_GETARG_BYTEA_P(0);
 
@@ -150,14 +150,14 @@ pg_snakeoil_find_virus(PG_FUNCTION_ARGS)
 		PG_RETURN_BOOL(false);
 	} else
 	{
-		elog(NOTICE, "Virus found: %s", result.virus_name);
+		elog(DEBUG1, "Virus found: %s", result.virus_name);
 		PG_RETURN_BOOL(true);
 	}
 }
 
-PG_FUNCTION_INFO_V1(pg_snakeoil_virus_name);
+PG_FUNCTION_INFO_V1(so_virus_name);
 Datum
-pg_snakeoil_virus_name(PG_FUNCTION_ARGS)
+so_virus_name(PG_FUNCTION_ARGS)
 {
 	bytea 	   *input = PG_GETARG_BYTEA_P(0);
 

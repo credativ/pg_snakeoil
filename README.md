@@ -48,11 +48,11 @@ sudo make install
 ### Preload
 
 pg_snakeoil is loaded by each PostgreSQL backend when needed.
-A instance of the engine is started for every new backend.
+An instance of the ClamAV engine is started for every new backend.
 This takes several seconds for the first function call after connecting.
 
 To avoid this, pg_snakeoil can be added to `shared_preload_libraries` in
-postgresql.conf:
+`postgresql.conf`:
 
 ```
 shared_preload_libraries = 'pg_snakeoil'
@@ -74,7 +74,7 @@ CREATE EXTENSION pg_snakeoil;
 
 ```SQL
 CREATE EXTENSION pg_snakeoil;
-CREATE DOMAIN safe_text AS text CHECK (not pg_snakeoil_find_virus(value));
+CREATE DOMAIN safe_text AS text CHECK (NOT pg_snakeoil_find_virus(value));
 CREATE TABLE t1(safe safe_text);
 
 INSERT INTO t1 VALUES ('This text is safe!');
@@ -87,12 +87,11 @@ ERROR:  value for domain safe_text violates check constraint "safe_text_check"
 
 ## Future Ideas
 
-### Scan via pg_logical
+### Scan via pg_recvlogical
 
-pg_receivelogical could be used to acquire the data
-entering the server instead of file system access, allowing offloading
-of the CPU-time required for scanning to another server. The reaction
-to a positive ClamAV result is fully customizable from asynchronous
-notification of the admins or synchronous denial of a commit to the
-application.
+`pg_recvlogical` could be used to acquire the data entering the server
+instead of file system access, allowing offloading of the CPU-time
+required for scanning to another server. The reaction to a positive
+ClamAV result is fully customizable from asynchronous notification of
+
 

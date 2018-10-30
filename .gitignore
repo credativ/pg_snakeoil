@@ -7,3 +7,6 @@
 *.so
 regression.diffs
 regression.out
+debian/.debhelper/*
+debian/files
+debian/postgresql-*-snakeoil*

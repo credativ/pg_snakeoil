@@ -29,3 +29,12 @@ LANGUAGE C IMMUTABLE STRICT;
 CREATE FUNCTION so_virus_name (bytea) RETURNS text
 AS 'MODULE_PATHNAME', 'so_virus_name'
 LANGUAGE C IMMUTABLE STRICT;
+
+-- ------------------------------------------------------------------------
+-- Management Functions
+-- ------------------------------------------------------------------------
+
+-- Update signatures, returns true if signatures changed, false otherwise
+CREATE FUNCTION so_update_signatures () RETURNS bool
+AS 'MODULE_PATHNAME', 'so_update_signatures'
+LANGUAGE C IMMUTABLE STRICT;

@@ -42,8 +42,17 @@ Returns true if the given data matches a signature in the virus database.
 Returns virus name if the given data matches a signature in the virus database,
 NULL otherwise.
 
+#### so_update_signatures () RETURNS bool
+
+Update signatures, returns true if signatures changed, false otherwise.
+
 
 ## Installation
+
+### Dependencies
+
+* libclamav
+* freshclam (recommended to keep signatures current)
 
 ### Compile
 
@@ -58,12 +67,17 @@ pg_snakeoil is loaded by each PostgreSQL backend when needed.
 An instance of the ClamAV engine is started for every new backend.
 This takes several seconds for the first function call after connecting.
 
-To avoid this, pg_snakeoil can be added to `shared_preload_libraries` in
+If backends (connections) do not persist and are only used for a single query, it might be interesting to avoid the overhead for the first function call by adding pg_snakeoil to `shared_preload_libraries` in
 `postgresql.conf`:
 
 ```
 shared_preload_libraries = 'pg_snakeoil'
 ```
+
+Keep in mind if loaded this way the ClamAV engine will use the signatures loaded while PostgreSQL was started!
+Newer signatures will not be loaded automatically!
+If the extension is not in `shared_preload_libraries` new signatures will be used for new connections automatically.
+The engine can also be reloaded manually with new signatures via `SELECT so_update_signatures ();`, but this only affects the current backend (connection)!
 
 ### Create Extension
 
@@ -77,7 +91,29 @@ CREATE EXTENSION pg_snakeoil;
 
 ### Functions
 
-#### Check Before Insert
+### Ad-hoc checks
+
+```SQL
+postgres=# SELECT so_is_infected('Not a virus!');
+ so_is_infected
+----------------
+ f
+(1 row)
+
+postgres=# SELECT so_is_infected('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
+ so_is_infected
+----------------
+ t
+(1 row)
+
+postgres=# SELECT so_virus_name('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
+    so_virus_name
+----------------------
+ Eicar-Test-Signature
+(1 row)
+```
+
+#### On Access Check
 
 ```SQL
 CREATE EXTENSION pg_snakeoil;
@@ -101,5 +137,3 @@ ERROR:  value for domain safe_text violates check constraint "safe_text_check"
 instead of file system access, allowing offloading of the CPU-time
 required for scanning to another server. The reaction to a positive
 ClamAV result is fully customizable from asynchronous notification of
-
-

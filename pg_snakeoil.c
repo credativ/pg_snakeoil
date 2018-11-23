@@ -16,6 +16,7 @@
 #if PG_VERSION_NUM >= 100000
 #include "utils/varlena.h"
 #endif
+#include "miscadmin.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,8 +30,15 @@
  */
 #define SNAKEOIL_DEBUG 0
 
+/* ClamAV defines */
+#define NO_SIGNATURE_CHANGE 0
+#define SIGNATURE_CHANGE 1
+
+
 PG_MODULE_MAGIC;
 
+void reload_engine(void);
+bool update_signatures(void);
 void _PG_init(void);
 void _PG_fini(void);
 struct scan_result scan_data(const char *data, size_t data_size);
@@ -49,33 +57,53 @@ struct scan_result
 };
 
 /*
- * Global variable to access the clamav engine
+ * Global variable to access the ClamAV engine
  */
 struct cl_engine *engine;
+const char *signatureDir;
+struct cl_stat signatureStat;
+
+void _PG_init()
+{
+	/*
+	 * Get different randomness for each process, recommended by ClamAV
+	 */
+	srand(getpid());
+
+	reload_engine();
+}
+
+void _PG_fini()
+{
+	cl_engine_free(engine);
+}
 
 /*
  * Initialize the engine for further use, this takes some time!
  */
-void _PG_init()
+void reload_engine()
 {
-	const char *dbDir;
 	unsigned int signatureNum;
 	int rv;
-
-	elog(NOTICE, "pg_snakeoil starts the clamav engine, this can take a while");
-
 	rv = cl_init(CL_INIT_DEFAULT);
+
 	if (CL_SUCCESS != rv)
 	{
 		elog(ERROR, "can't initialize libclamav: %s", cl_strerror(rv));
 	}
 
 	engine = cl_engine_new();
-	dbDir = cl_retdbdir();
+	signatureDir = cl_retdbdir();
 	signatureNum = 0;
-	elog(DEBUG1, "Use default db dir '%s'", dbDir);
+	elog(DEBUG1, "use default signature dir '%s'", signatureDir);
 
-	rv = cl_load(dbDir, engine, &signatureNum, CL_DB_STDOPT);
+	/*
+	 * Get the current state of the signatures
+	 */
+	memset(&signatureStat, 0, sizeof(struct cl_stat));
+	cl_statinidir(signatureDir, &signatureStat);
+
+	rv = cl_load(signatureDir, engine, &signatureNum, CL_DB_STDOPT);
 	if (CL_SUCCESS != rv)
 	{
 		elog(ERROR, "failure loading ClamAV databases: %s", cl_strerror(rv));
@@ -86,12 +114,30 @@ void _PG_init()
 	if (CL_SUCCESS != rv)
 	{
 		elog(ERROR, "cannot create ClamAV engine: %s", cl_strerror(rv));
+		cl_engine_free(engine);
 	}
+
+	/*
+	 * Only log start info if loaded via shared_preload_libraries,
+	 * othervise we could spam the log.
+	 */
+	if (process_shared_preload_libraries_in_progress)
+		elog(LOG, "ClamAV engine started with signatureNum %d from %s",
+			signatureNum, signatureDir);
 }
 
-void _PG_fini()
+bool update_signatures()
 {
-	cl_engine_free(engine);
+	/*
+	 * If signatures have changed, reload the engine
+	 */
+	if(cl_statchkdir(&signatureStat) == SIGNATURE_CHANGE) {
+		elog(DEBUG1, "newer ClamAV signatures found");
+		reload_engine();
+		return true;
+	}
+
+	return false;
 }
 
 struct scan_result scan_data(const char *data, size_t data_size)
@@ -100,11 +146,11 @@ struct scan_result scan_data(const char *data, size_t data_size)
 	cl_fmap_t *map;
 
 	/*
-	* Open a map for scanning custom data, where the data is already in memory,
-	* either in the form of a buffer, a memory mapped file, etc.
-	* Note that the memory [start, start+len) must be the _entire_ file,
-	* you can't give it parts of a file and expect detection to work.
-	*/
+	 * Open a map for scanning custom data, where the data is already in memory,
+	 * either in the form of a buffer, a memory mapped file, etc.
+	 * Note that the memory [start, start+len) must be the _entire_ file,
+	 * you can't give it parts of a file and expect detection to work.
+	 */
 	map = cl_fmap_open_memory(data, data_size);
 
 	#ifdef SNAKEOIL_DEBUG
@@ -125,6 +171,13 @@ struct scan_result scan_data(const char *data, size_t data_size)
 	cl_fmap_close(map);
 
 	return result;
+}
+
+PG_FUNCTION_INFO_V1(so_update_signatures);
+Datum
+so_update_signatures(PG_FUNCTION_ARGS)
+{
+	PG_RETURN_BOOL(update_signatures());
 }
 
 PG_FUNCTION_INFO_V1(so_is_infected);

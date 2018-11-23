@@ -1,6 +1,13 @@
 CREATE EXTENSION pg_snakeoil;
 
 -- ------------------------------------------------------------------------
+-- Management Functions
+-- ------------------------------------------------------------------------
+
+SELECT so_update_signatures(); -- Should show change => true
+SELECT so_update_signatures(); -- Should show no change => false
+
+-- ------------------------------------------------------------------------
 -- Text Functions
 -- ------------------------------------------------------------------------
 
@@ -17,4 +24,3 @@ SELECT so_is_infected(E'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TES
 SELECT so_virus_name(E'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'::bytea);
 SELECT so_is_infected(E'Hello World!'::bytea);
 SELECT so_virus_name(E'Hello World!'::bytea);
-

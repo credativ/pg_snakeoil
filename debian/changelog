@@ -1,5 +1,5 @@
-pg-snakeoil (1.0-1) UNRELEASED; urgency=medium
+pg-snakeoil (1.0-1) unstable; urgency=medium
 
   * Initial release.
 
- -- Christoph Berg <christoph.berg@credativ.de>  Mon, 29 Oct 2018 15:17:35 +0100
+ -- Christoph Berg <christoph.berg@credativ.de>  Mon, 28 Jan 2019 14:06:57 +0100

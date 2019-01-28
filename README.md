@@ -74,10 +74,10 @@ If backends (connections) do not persist and are only used for a single query, i
 shared_preload_libraries = 'pg_snakeoil'
 ```
 
-Keep in mind if loaded this way the ClamAV engine will use the signatures loaded while PostgreSQL was started!
-Newer signatures will not be loaded automatically!
-If the extension is not in `shared_preload_libraries` new signatures will be used for new connections automatically.
-The engine can also be reloaded manually with new signatures via `SELECT so_update_signatures ();`, but this only affects the current backend (connection)!
+When loaded this way, the ClamAV engine will use the signatures loaded while PostgreSQL was started.
+Newer signatures will not be loaded automatically.
+If the extension is not in `shared_preload_libraries`, new signatures will be used for new connections automatically.
+The engine can also be reloaded manually with new signatures via `SELECT so_update_signatures ();`, but this only affects the current backend (connection).
 
 ### Create Extension
 

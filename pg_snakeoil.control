@@ -1,5 +1,5 @@
 # pg_snakeoil extension
 comment = 'The PostgreSQL Antivirus'
-default_version = '0.4'
+default_version = '1'
 module_pathname = '$libdir/pg_snakeoil'
 relocatable = true

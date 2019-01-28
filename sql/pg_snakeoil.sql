@@ -4,8 +4,7 @@ CREATE EXTENSION pg_snakeoil;
 -- Management Functions
 -- ------------------------------------------------------------------------
 
-SELECT so_update_signatures(); -- Should show change => true
-SELECT so_update_signatures(); -- Should show no change => false
+SELECT so_update_signatures();
 
 -- ------------------------------------------------------------------------
 -- Text Functions

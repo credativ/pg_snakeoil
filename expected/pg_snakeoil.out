@@ -2,13 +2,7 @@ CREATE EXTENSION pg_snakeoil;
 -- ------------------------------------------------------------------------
 -- Management Functions
 -- ------------------------------------------------------------------------
-SELECT so_update_signatures(); -- Should show change => true
- so_update_signatures 
-----------------------
- t
-(1 row)
-
-SELECT so_update_signatures(); -- Should show no change => false
+SELECT so_update_signatures();
  so_update_signatures 
 ----------------------
  f

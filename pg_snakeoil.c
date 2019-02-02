@@ -161,7 +161,30 @@ struct scan_result scan_data(const char *data, size_t data_size)
 	/*
 	 * Scan data
 	 */
+
+#if defined(CL_SCAN_STDOPT) /* test for incompatible API change in 0.101 */
+	/* version 0.100 */
 	result.return_code = cl_scanmap_callback(map, &result.virus_name, &result.scanned, engine, CL_SCAN_STDOPT, NULL);
+#else
+	/* version 0.101 */
+	{
+	     static struct cl_scan_options cl_scan_options = {
+		  .parse = CL_SCAN_PARSE_ARCHIVE | CL_SCAN_PARSE_ELF
+		  | CL_SCAN_PARSE_PDF | CL_SCAN_PARSE_SWF | CL_SCAN_PARSE_HWP3
+		  | CL_SCAN_PARSE_XMLDOCS | CL_SCAN_PARSE_MAIL
+		  | CL_SCAN_PARSE_OLE2 | CL_SCAN_PARSE_HTML | CL_SCAN_PARSE_PE
+	};
+
+	result.return_code =
+	     cl_scanmap_callback(map,
+				 NULL,
+				 &result.virus_name,
+				 &result.scanned,
+				 engine,
+				 &cl_scan_options,
+				 NULL);
+	}
+#endif
 	elog(DEBUG2, "cl_scanmap_callback returned: %d virusname: %s", result.return_code, result.virus_name);
 
 	/*

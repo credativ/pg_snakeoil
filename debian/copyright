@@ -3,7 +3,9 @@ Upstream-Name: pg_snakeoil
 Source: https://github.com/credativ/pg_snakeoil
 
 Files: *
-Copyright: Copyright (c) 2018, credativ GmbH
+Copyright:
+ Copyright (c) 2018, Alexander Sosna
+ Copyright (c) 2018, credativ GmbH
 License: snakeoil
  Permission to use, copy, modify, and distribute this software and its
  documentation for any purpose, without fee, and without a written agreement

@@ -5,6 +5,7 @@
 *.o
 *.bc
 *.so
+*.typedefs
 regression.diffs
 regression.out
 debian/.debhelper/*

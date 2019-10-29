@@ -1,3 +1,9 @@
+pg-snakeoil (1.2-1) unstable; urgency=medium
+
+  * Upload for PostgreSQL 12.
+
+ -- Christoph Berg <myon@debian.org>  Tue, 29 Oct 2019 13:40:03 +0100
+
 pg-snakeoil (1.1-1) unstable; urgency=medium
 
   * New upstream version, fixes compatibility with clamav 0.101.

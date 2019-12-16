@@ -61,6 +61,14 @@ make PG_CONFIG=/path/to/pg_config
 sudo make install
 ```
 
+### Testing
+
+In postgresql.conf, set `pg_snakeoil.signature_dir = /path/to/pg_snakeoil.git/testfiles`.
+
+```bash
+make installcheck
+```
+
 ### Preload
 
 pg_snakeoil is loaded by each PostgreSQL backend when needed.

@@ -10,8 +10,8 @@ SELECT so_update_signatures();
 -- Text Functions
 -- ------------------------------------------------------------------------
 
-SELECT so_is_infected('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
-SELECT so_virus_name('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
+SELECT so_is_infected('the quick brown fox jumps over the lazy dog');
+SELECT so_virus_name('the quick brown fox jumps over the lazy dog');
 SELECT so_is_infected('Hello World!');
 SELECT so_virus_name('Hello World!');
 
@@ -19,7 +19,7 @@ SELECT so_virus_name('Hello World!');
 -- bytea Functions
 -- ------------------------------------------------------------------------
 
-SELECT so_is_infected('X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'::bytea);
-SELECT so_virus_name('X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'::bytea);
+SELECT so_is_infected('the quick brown fox jumps over the lazy dog'::bytea);
+SELECT so_virus_name('the quick brown fox jumps over the lazy dog'::bytea);
 SELECT so_is_infected('Hello World!'::bytea);
 SELECT so_virus_name('Hello World!'::bytea);

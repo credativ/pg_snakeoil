@@ -11,16 +11,16 @@ SELECT so_update_signatures();
 -- ------------------------------------------------------------------------
 -- Text Functions
 -- ------------------------------------------------------------------------
-SELECT so_is_infected('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
+SELECT so_is_infected('the quick brown fox jumps over the lazy dog');
  so_is_infected 
 ----------------
  t
 (1 row)
 
-SELECT so_virus_name('X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
-    so_virus_name     
-----------------------
- Eicar-Test-Signature
+SELECT so_virus_name('the quick brown fox jumps over the lazy dog');
+         so_virus_name          
+--------------------------------
+ The Quick Brown Fox.UNOFFICIAL
 (1 row)
 
 SELECT so_is_infected('Hello World!');
@@ -38,16 +38,16 @@ SELECT so_virus_name('Hello World!');
 -- ------------------------------------------------------------------------
 -- bytea Functions
 -- ------------------------------------------------------------------------
-SELECT so_is_infected('X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'::bytea);
+SELECT so_is_infected('the quick brown fox jumps over the lazy dog'::bytea);
  so_is_infected 
 ----------------
  t
 (1 row)
 
-SELECT so_virus_name('X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'::bytea);
-    so_virus_name     
-----------------------
- Eicar-Test-Signature
+SELECT so_virus_name('the quick brown fox jumps over the lazy dog'::bytea);
+         so_virus_name          
+--------------------------------
+ The Quick Brown Fox.UNOFFICIAL
 (1 row)
 
 SELECT so_is_infected('Hello World!'::bytea);

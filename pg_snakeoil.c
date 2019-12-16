@@ -13,6 +13,7 @@
 #include <ctype.h>
 
 #include "utils/builtins.h"
+#include "utils/guc.h"
 #if PG_VERSION_NUM >= 100000
 #include "utils/varlena.h"
 #endif
@@ -60,7 +61,7 @@ struct scan_result
  * Global variable to access the ClamAV engine
  */
 struct cl_engine *engine;
-const char *signatureDir;
+char *signatureDir;
 struct cl_stat signatureStat;
 
 void
@@ -70,6 +71,19 @@ _PG_init()
 	 * Get different randomness for each process, recommended by ClamAV
 	 */
 	srand(getpid());
+
+	DefineCustomStringVariable("pg_snakeoil.signature_dir",
+			"ClamAV signature directory",
+			"ClamAV signature directory",
+			&signatureDir,
+			cl_retdbdir(),
+			PGC_SUSET,
+			0, /* no flags */
+			NULL, /* GucStringCheckHook check_hook, */
+			NULL, /* GucStringAssignHook assign_hook, */
+			NULL); /* GucShowHook show_hook) */
+
+	EmitWarningsOnPlaceholders("pg_snakeoil");
 
 	reload_engine();
 }
@@ -97,9 +111,9 @@ reload_engine()
 	}
 
 	engine = cl_engine_new();
-	signatureDir = cl_retdbdir();
+	//signatureDir = cl_retdbdir();
 	signatureNum = 0;
-	elog(DEBUG1, "use default signature dir '%s'", signatureDir);
+	elog(DEBUG1, "using signature dir '%s'", signatureDir);
 
 	/*
 	 * Get the current state of the signatures

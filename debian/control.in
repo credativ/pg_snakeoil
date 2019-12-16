@@ -14,10 +14,11 @@ Vcs-Git: https://github.com/credativ/pg_snakeoil.git
 Package: postgresql-PGVERSION-snakeoil
 Architecture: any
 Depends:
- clamav-freshclam | clamav-data,
  postgresql-PGVERSION,
  ${misc:Depends},
  ${shlibs:Depends},
+Recommends:
+ clamav-freshclam | clamav-data,
 Description: PostgreSQL anti-virus scanner based on ClamAV
  pg_snakeoil provides functions scanning PostgreSQL data for viruses using the
  ClamAV anti-virus engine.

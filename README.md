@@ -17,6 +17,8 @@ pg_snakeoil provides ClamAV scanning of all data in PostgreSQL in a way that
 does not interfere with the proper functioning of PostgreSQL and does not cause
 collateral damage or unnecessary downtimes.
 
+[![Build Status](https://travis-ci.org/credativ/pg_snakeoil.svg?branch=master)](https://travis-ci.org/credativ/pg_snakeoil)
+
 ## Usage
 
 ### SQL Functions
@@ -63,7 +65,7 @@ sudo make install
 
 ### Testing
 
-In postgresql.conf, set `pg_snakeoil.signature_dir = /path/to/pg_snakeoil.git/testfiles`.
+In postgresql.conf, set `pg_snakeoil.signature_dir = '/path/to/pg_snakeoil.git/testfiles'`.
 
 ```bash
 make installcheck

@@ -60,17 +60,29 @@ struct scan_result
 /*
  * Global variable to access the ClamAV engine
  */
-struct cl_engine *engine;
+struct cl_engine *engine = NULL;
 char *signatureDir;
 struct cl_stat signatureStat;
+
 
 void
 _PG_init()
 {
+	int			rv;
+
 	/*
 	 * Get different randomness for each process, recommended by ClamAV
 	 */
 	srand(getpid());
+
+	elog(DEBUG1, "initializing the pg_snakeoil extension");
+
+	rv = cl_init(CL_INIT_DEFAULT);
+
+	if (CL_SUCCESS != rv)
+	{
+		elog(ERROR, "can't initialize libclamav: %s", cl_strerror(rv));
+	}
 
 	DefineCustomStringVariable("pg_snakeoil.signature_dir",
 			"ClamAV signature directory",
@@ -100,19 +112,18 @@ _PG_fini()
 void
 reload_engine()
 {
-	unsigned int signatureNum;
+	unsigned int signatureNum = 0;
 	int			rv;
 
-	rv = cl_init(CL_INIT_DEFAULT);
+	elog(DEBUG1, "reloading ClamAV engine");
 
-	if (CL_SUCCESS != rv)
+	if (engine != NULL)
 	{
-		elog(ERROR, "can't initialize libclamav: %s", cl_strerror(rv));
+		elog(DEBUG1, "free existing ClamAV engine");
+		cl_engine_free(engine);
 	}
 
 	engine = cl_engine_new();
-	//signatureDir = cl_retdbdir();
-	signatureNum = 0;
 	elog(DEBUG1, "using signature dir '%s'", signatureDir);
 
 	/*

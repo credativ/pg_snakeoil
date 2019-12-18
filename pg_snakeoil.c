@@ -88,8 +88,8 @@ _PG_init()
 							   "ClamAV signature directory",
 							   "ClamAV signature directory",
 							   &signatureDir,
-							   cl_retdbdir(),
-							   PGC_SUSET,
+							   cl_retdbdir(),	/* ClamAV default signature directory */
+							   PGC_SU_BACKEND,	/* forbid changing directory after startup, restrict to superusers */
 							   0,	/* no flags */
 							   NULL,	/* GucStringCheckHook check_hook, */
 							   NULL,	/* GucStringAssignHook assign_hook, */

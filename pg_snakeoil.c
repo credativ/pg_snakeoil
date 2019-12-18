@@ -61,7 +61,7 @@ struct scan_result
  * Global variable to access the ClamAV engine
  */
 struct cl_engine *engine = NULL;
-char *signatureDir;
+char	   *signatureDir;
 struct cl_stat signatureStat;
 
 
@@ -85,15 +85,15 @@ _PG_init()
 	}
 
 	DefineCustomStringVariable("pg_snakeoil.signature_dir",
-			"ClamAV signature directory",
-			"ClamAV signature directory",
-			&signatureDir,
-			cl_retdbdir(),
-			PGC_SUSET,
-			0, /* no flags */
-			NULL, /* GucStringCheckHook check_hook, */
-			NULL, /* GucStringAssignHook assign_hook, */
-			NULL); /* GucShowHook show_hook) */
+							   "ClamAV signature directory",
+							   "ClamAV signature directory",
+							   &signatureDir,
+							   cl_retdbdir(),
+							   PGC_SUSET,
+							   0,	/* no flags */
+							   NULL,	/* GucStringCheckHook check_hook, */
+							   NULL,	/* GucStringAssignHook assign_hook, */
+							   NULL);	/* GucShowHook show_hook) */
 
 	EmitWarningsOnPlaceholders("pg_snakeoil");
 

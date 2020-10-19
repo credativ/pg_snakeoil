@@ -4,17 +4,18 @@ Priority: optional
 Maintainer: Debian PostgreSQL Maintainers <team+postgresql@tracker.debian.org>
 Uploaders: Christoph Berg <myon@debian.org>
 Build-Depends:
- debhelper (>= 10~),
+ debhelper-compat (= 13),
  libclamav-dev,
- postgresql-server-dev-all (>= 153~),
-Standards-Version: 4.2.1
+ postgresql-all (>= 217~),
+Standards-Version: 4.5.0
+Rules-Requires-Root: no
 Vcs-Browser: https://github.com/credativ/pg_snakeoil
 Vcs-Git: https://github.com/credativ/pg_snakeoil.git
 
-Package: postgresql-12-snakeoil
+Package: postgresql-13-snakeoil
 Architecture: any
 Depends:
- postgresql-12,
+ postgresql-13,
  ${misc:Depends},
  ${shlibs:Depends},
 Recommends:

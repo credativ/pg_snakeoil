@@ -12,10 +12,10 @@ Rules-Requires-Root: no
 Vcs-Browser: https://github.com/credativ/pg_snakeoil
 Vcs-Git: https://github.com/credativ/pg_snakeoil.git
 
-Package: postgresql-13-snakeoil
+Package: postgresql-14-snakeoil
 Architecture: any
 Depends:
- postgresql-13,
+ postgresql-14,
  ${misc:Depends},
  ${shlibs:Depends},
 Recommends:

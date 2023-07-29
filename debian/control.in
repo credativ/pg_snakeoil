@@ -9,8 +9,8 @@ Build-Depends:
  postgresql-all (>= 217~),
 Standards-Version: 4.6.1
 Rules-Requires-Root: no
-Vcs-Browser: https://github.com/credativ/pg_snakeoil
-Vcs-Git: https://github.com/credativ/pg_snakeoil.git
+Vcs-Browser: https://github.com/df7cb/pg_snakeoil
+Vcs-Git: https://github.com/df7cb/pg_snakeoil.git
 
 Package: postgresql-PGVERSION-snakeoil
 Architecture: any

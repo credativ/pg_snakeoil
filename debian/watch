@@ -1,2 +1,2 @@
 version=4
-https://github.com/credativ/pg_snakeoil/tags .*/v(.*).tar.gz
+https://github.com/df7cb/pg_snakeoil/tags .*/v(.*).tar.gz

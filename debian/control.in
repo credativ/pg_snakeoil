@@ -9,6 +9,7 @@ Build-Depends:
  postgresql-all (>= 217~),
 Standards-Version: 4.6.2
 Rules-Requires-Root: no
+Homepage: https://github.com/df7cb/pg_snakeoil
 Vcs-Browser: https://github.com/df7cb/pg_snakeoil
 Vcs-Git: https://github.com/df7cb/pg_snakeoil.git
 

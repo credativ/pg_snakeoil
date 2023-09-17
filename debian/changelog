@@ -1,4 +1,4 @@
-pg-snakeoil (1.3-5) unstable; urgency=medium
+pg-snakeoil (1.4-1) unstable; urgency=medium
 
   * Upload for PostgreSQL 16.
   * Use ${postgresql:Depends}.

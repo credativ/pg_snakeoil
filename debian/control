@@ -7,15 +7,15 @@ Build-Depends:
  debhelper-compat (= 13),
  libclamav-dev,
  postgresql-all (>= 217~),
-Standards-Version: 4.6.1
+Standards-Version: 4.6.2
 Rules-Requires-Root: no
 Vcs-Browser: https://github.com/df7cb/pg_snakeoil
 Vcs-Git: https://github.com/df7cb/pg_snakeoil.git
 
-Package: postgresql-15-snakeoil
+Package: postgresql-16-snakeoil
 Architecture: any
 Depends:
- postgresql-15,
+ ${postgresql:Depends},
  ${misc:Depends},
  ${shlibs:Depends},
 Recommends:

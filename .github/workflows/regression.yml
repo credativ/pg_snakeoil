@@ -13,13 +13,11 @@ jobs:
     strategy:
       matrix:
         pgversion:
+          - 18
+          - 17
           - 16
           - 15
           - 14
-          - 13
-          - 12
-          - 11
-          - 10
 
     env:
       PGVERSION: ${{ matrix.pgversion }}

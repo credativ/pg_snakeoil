@@ -26,9 +26,12 @@ jobs:
     - name: checkout
       uses: actions/checkout@v3
 
+    - name: install clamav
+      run: |
+        sudo apt-get install -y libclamav-dev clamav-freshclam
+
     - name: install pg
       run: |
-        sudo apt-get install -y libclamav-dev
         sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -v $PGVERSION -p -i
         sudo -u postgres createuser -s "$USER"
         chmod --verbose go+rx $HOME # drwxr-x--- runner docker /home/runner
